@@ -29,18 +29,22 @@ class PharmacyAPITester:
             print(f"   Details: {details}")
 
     def test_root_endpoint(self):
-        """Test root API endpoint"""
+        """Test root endpoint (frontend)"""
         try:
             response = requests.get(f"{self.base_url}/", timeout=10)
             success = response.status_code == 200
             details = f"Status: {response.status_code}"
             if success:
-                data = response.json()
-                details += f", Message: {data.get('message', 'N/A')}"
-            self.log_test("Root Endpoint", success, details)
+                # Root endpoint returns HTML (frontend), not JSON
+                if "html" in response.text.lower():
+                    details += ", Frontend HTML loaded"
+                else:
+                    details += ", Unexpected content"
+                    success = False
+            self.log_test("Root Endpoint (Frontend)", success, details)
             return success
         except Exception as e:
-            self.log_test("Root Endpoint", False, f"Error: {str(e)}")
+            self.log_test("Root Endpoint (Frontend)", False, f"Error: {str(e)}")
             return False
 
     def test_get_all_pharmacies(self):
