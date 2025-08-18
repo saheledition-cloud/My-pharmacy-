@@ -237,6 +237,10 @@ async def search_medication(query: UserQuery):
 async def chat_with_pharmacy(pharmacy_id: str, message: str, user_id: str):
     """Chat with pharmacy AI agent"""
     try:
+        # Check if OpenAI client is available
+        if not openai_client:
+            return {"response": "Désolé, le service de chat IA n'est pas disponible pour le moment. Veuillez contacter directement la pharmacie."}
+        
         # Get pharmacy details
         pharmacy = await db.pharmacies.find_one({"id": pharmacy_id})
         if not pharmacy:
@@ -290,7 +294,7 @@ async def chat_with_pharmacy(pharmacy_id: str, message: str, user_id: str):
         return {"response": ai_response}
         
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error processing chat: {str(e)}")
+        return {"response": f"Désolé, une erreur est survenue: {str(e)}. Veuillez contacter directement la pharmacie."}
 
 @app.post("/api/prescriptions")
 async def submit_prescription(prescription: Prescription):
