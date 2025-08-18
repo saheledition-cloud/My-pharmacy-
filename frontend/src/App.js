@@ -270,12 +270,28 @@ function App() {
             </Card>
           </div>
 
-          {/* Map and Details */}
+          {/* Map - Temporarily Disabled */}
           <div className="lg:col-span-2 space-y-4">
-            {/* Map */}
             <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
-              <CardContent className="p-0">
-                <div ref={mapContainer} className="h-96 w-full rounded-lg" />
+              <CardContent className="p-6">
+                <Alert className="mb-4">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>
+                    La carte interactive est temporairement désactivée. 
+                    Un token public Mapbox (pk.*) est requis pour activer la fonctionnalité carte.
+                  </AlertDescription>
+                </Alert>
+                
+                <div className="h-96 w-full rounded-lg bg-gradient-to-r from-emerald-100 to-teal-100 flex items-center justify-center">
+                  <div className="text-center">
+                    <MapPin className="h-16 w-16 mx-auto text-emerald-600 mb-4" />
+                    <h3 className="text-xl font-semibold text-gray-800 mb-2">Carte Interactive</h3>
+                    <p className="text-gray-600">Visualisation des pharmacies par secteur</p>
+                    <p className="text-sm text-gray-500 mt-2">
+                      {filteredPharmacies.length} pharmacie(s) trouvée(s)
+                    </p>
+                  </div>
+                </div>
               </CardContent>
             </Card>
 
