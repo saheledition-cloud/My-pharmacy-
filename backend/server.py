@@ -16,7 +16,9 @@ CORS_ORIGINS = os.environ.get("CORS_ORIGINS", "*").split(",")
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 
 # Initialize OpenAI client
-openai_client = OpenAI(api_key=OPENAI_API_KEY)
+openai_client = None
+if OPENAI_API_KEY:
+    openai_client = OpenAI(api_key=OPENAI_API_KEY)
 
 app = FastAPI(title="Pharmacy Platform API", version="1.0.0")
 
