@@ -35,24 +35,8 @@ function App() {
   };
 
   // Initialize map
-  useEffect(() => {
-    if (!map.current && mapContainer.current) {
-      map.current = new mapboxgl.Map({
-        container: mapContainer.current,
-        style: 'mapbox://styles/mapbox/light-v11',
-        center: [3.0588, 36.7538], // Algiers center
-        zoom: 10
-      });
-
-      map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
-    }
-
-    return () => {
-      if (map.current) {
-        map.current.remove();
-      }
-    };
-  }, []);
+  // Note: Map functionality disabled - requires public Mapbox token (pk.*)
+  // Current token is secret token (sk.*) which cannot be used in frontend
 
   // Fetch pharmacies
   useEffect(() => {
@@ -76,59 +60,6 @@ function App() {
 
     fetchPharmacies();
   }, [selectedWilaya, selectedCommune, searchQuery]);
-
-  // Update map markers
-  useEffect(() => {
-    if (map.current && filteredPharmacies.length > 0) {
-      // Clear existing markers
-      const existingMarkers = document.querySelectorAll('.mapboxgl-marker');
-      existingMarkers.forEach(marker => marker.remove());
-
-      // Add new markers
-      filteredPharmacies.forEach(pharmacy => {
-        // Determine marker color based on availability
-        const hasStock = pharmacy.stock && pharmacy.stock.some(item => item.available);
-        const isGuard = pharmacy.is_guard;
-        
-        let markerColor = '#ef4444'; // Red for no stock
-        if (hasStock) markerColor = '#10b981'; // Green for available
-        if (isGuard) markerColor = '#3b82f6'; // Blue for guard pharmacy
-
-        const marker = new mapboxgl.Marker({ color: markerColor })
-          .setLngLat([pharmacy.location.lng, pharmacy.location.lat])
-          .setPopup(
-            new mapboxgl.Popup({ offset: 25 }).setHTML(`
-              <div class="p-2">
-                <h3 class="font-semibold">${pharmacy.name}</h3>
-                <p class="text-sm text-gray-600">${pharmacy.location.address}</p>
-                <p class="text-sm">${pharmacy.phone}</p>
-                ${isGuard ? '<span class="text-blue-600 font-medium">🌙 Pharmacie de garde</span>' : ''}
-              </div>
-            `)
-          )
-          .addTo(map.current);
-
-        // Add click event to select pharmacy
-        marker.getElement().addEventListener('click', () => {
-          setSelectedPharmacy(pharmacy);
-        });
-      });
-
-      // Fit map to show all markers
-      if (filteredPharmacies.length === 1) {
-        map.current.flyTo({
-          center: [filteredPharmacies[0].location.lng, filteredPharmacies[0].location.lat],
-          zoom: 15
-        });
-      } else if (filteredPharmacies.length > 1) {
-        const bounds = new mapboxgl.LngLatBounds();
-        filteredPharmacies.forEach(pharmacy => {
-          bounds.extend([pharmacy.location.lng, pharmacy.location.lat]);
-        });
-        map.current.fitBounds(bounds, { padding: 50 });
-      }
-    }
-  }, [filteredPharmacies]);
 
   const handleChatSubmit = async () => {
     if (!chatMessage.trim() || !selectedPharmacy) return;
