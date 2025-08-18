@@ -7,7 +7,7 @@ import os
 import uuid
 from datetime import datetime
 import json
-import openai
+from openai import OpenAI
 
 # Environment variables
 MONGO_URL = os.environ.get("MONGO_URL", "mongodb://localhost:27017")
@@ -15,8 +15,8 @@ DB_NAME = os.environ.get("DB_NAME", "pharmacy_platform")
 CORS_ORIGINS = os.environ.get("CORS_ORIGINS", "*").split(",")
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 
-# Initialize OpenAI
-openai.api_key = OPENAI_API_KEY
+# Initialize OpenAI client
+openai_client = OpenAI(api_key=OPENAI_API_KEY)
 
 app = FastAPI(title="Pharmacy Platform API", version="1.0.0")
 
@@ -263,7 +263,7 @@ async def chat_with_pharmacy(pharmacy_id: str, message: str, user_id: str):
         """
         
         # Call OpenAI API
-        response = openai.ChatCompletion.create(
+        response = openai_client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": pharmacy_context},
