@@ -15,8 +15,6 @@ import './App.css';
 const API_BASE_URL = process.env.REACT_APP_BACKEND_URL;
 
 function App() {
-  const mapContainer = useRef(null);
-  const map = useRef(null);
   const [pharmacies, setPharmacies] = useState([]);
   const [filteredPharmacies, setFilteredPharmacies] = useState([]);
   const [selectedPharmacy, setSelectedPharmacy] = useState(null);
