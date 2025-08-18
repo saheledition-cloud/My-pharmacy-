@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
-import mapboxgl from 'mapbox-gl';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Search, MapPin, Phone, Clock, MessageCircle, Upload, Camera } from 'lucide-react';
+import { Search, MapPin, Phone, Clock, MessageCircle, Upload, Camera, AlertCircle } from 'lucide-react';
 import { Button } from './components/ui/button';
 import { Input } from './components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
@@ -10,10 +9,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './components/ui/dialog';
 import { Textarea } from './components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './components/ui/select';
+import { Alert, AlertDescription } from './components/ui/alert';
 import './App.css';
-
-// Mapbox access token
-mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_TOKEN;
 
 const API_BASE_URL = process.env.REACT_APP_BACKEND_URL;
 
