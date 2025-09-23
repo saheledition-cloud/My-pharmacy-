@@ -111,6 +111,13 @@ function App() {
                 <Clock className="h-3 w-3 mr-1" />
                 Temps réel
               </Badge>
+              <Button 
+                onClick={() => window.location.href = '/admin'}
+                variant="outline"
+                className="border-emerald-200 text-emerald-700 hover:bg-emerald-50"
+              >
+                Administration
+              </Button>
             </div>
           </div>
         </div>
