@@ -112,6 +112,13 @@ function App() {
                 Temps réel
               </Badge>
               <Button 
+                onClick={() => window.location.href = '/login'}
+                variant="outline"
+                className="border-blue-200 text-blue-700 hover:bg-blue-50"
+              >
+                Connexion Pharmacie
+              </Button>
+              <Button 
                 onClick={() => window.location.href = '/admin'}
                 variant="outline"
                 className="border-emerald-200 text-emerald-700 hover:bg-emerald-50"
