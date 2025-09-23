@@ -308,6 +308,104 @@ async def get_user_prescriptions(user_id: str):
     prescriptions = await db.prescriptions.find({"user_id": user_id}).to_list(length=None)
     return [Prescription(**prescription) for prescription in prescriptions]
 
+# Admin API Routes
+@app.get("/api/admin/stats")
+async def get_admin_stats():
+    """Get admin dashboard statistics"""
+    try:
+        total_pharmacies = await db.pharmacies.count_documents({})
+        active_subscriptions = await db.pharmacies.count_documents({"subscription_active": True})
+        guard_pharmacies = await db.pharmacies.count_documents({"is_guard": True})
+        
+        # Count total medications in stock
+        pharmacies = await db.pharmacies.find().to_list(length=None)
+        total_medications = sum(len(pharmacy.get("stock", [])) for pharmacy in pharmacies)
+        
+        return {
+            "total_pharmacies": total_pharmacies,
+            "active_subscriptions": active_subscriptions,
+            "total_medications": total_medications,
+            "guard_pharmacies": guard_pharmacies
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching stats: {str(e)}")
+
+@app.post("/api/admin/pharmacies", response_model=Pharmacy)
+async def add_pharmacy(pharmacy: Pharmacy):
+    """Add a new pharmacy"""
+    try:
+        pharmacy_dict = pharmacy.dict()
+        result = await db.pharmacies.insert_one(pharmacy_dict)
+        if result.inserted_id:
+            return pharmacy
+        else:
+            raise HTTPException(status_code=500, detail="Failed to insert pharmacy")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error adding pharmacy: {str(e)}")
+
+@app.put("/api/admin/pharmacies/{pharmacy_id}", response_model=Pharmacy)
+async def update_pharmacy(pharmacy_id: str, updates: Dict[str, Any]):
+    """Update pharmacy information"""
+    try:
+        result = await db.pharmacies.update_one(
+            {"id": pharmacy_id},
+            {"$set": updates}
+        )
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Pharmacy not found")
+        
+        updated_pharmacy = await db.pharmacies.find_one({"id": pharmacy_id})
+        return Pharmacy(**updated_pharmacy)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error updating pharmacy: {str(e)}")
+
+@app.delete("/api/admin/pharmacies/{pharmacy_id}")
+async def delete_pharmacy(pharmacy_id: str):
+    """Delete a pharmacy"""
+    try:
+        result = await db.pharmacies.delete_one({"id": pharmacy_id})
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Pharmacy not found")
+        return {"message": "Pharmacy deleted successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error deleting pharmacy: {str(e)}")
+
+@app.put("/api/admin/pharmacies/{pharmacy_id}/stock")
+async def update_pharmacy_stock_admin(pharmacy_id: str, stock: List[PharmacyStock]):
+    """Update pharmacy stock (admin endpoint)"""
+    try:
+        result = await db.pharmacies.update_one(
+            {"id": pharmacy_id},
+            {"$set": {"stock": [item.dict() for item in stock]}}
+        )
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Pharmacy not found")
+        return {"message": "Stock updated successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error updating stock: {str(e)}")
+
+@app.get("/api/admin/pharmacies/{pharmacy_id}/prescriptions")
+async def get_pharmacy_prescriptions(pharmacy_id: str):
+    """Get prescriptions for a specific pharmacy"""
+    try:
+        prescriptions = await db.prescriptions.find({"pharmacy_id": pharmacy_id}).to_list(length=None)
+        return [Prescription(**prescription) for prescription in prescriptions]
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching prescriptions: {str(e)}")
+
+@app.get("/api/admin/chat-messages")
+async def get_all_chat_messages(pharmacy_id: Optional[str] = None):
+    """Get chat messages, optionally filtered by pharmacy"""
+    try:
+        query = {}
+        if pharmacy_id:
+            query["pharmacy_id"] = pharmacy_id
+        
+        messages = await db.chat_messages.find(query).sort("created_at", -1).to_list(length=None)
+        return [ChatMessage(**message) for message in messages]
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching chat messages: {str(e)}")
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8001)
