@@ -276,7 +276,7 @@ function PharmacyDashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{stats.low_stock || 0}</div>
-                  <p className="text-xs text-gray-600">< 10 unités</p>
+                  <p className="text-xs text-gray-600">&lt; 10 unités</p>
                 </CardContent>
               </Card>
 
